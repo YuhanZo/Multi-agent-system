@@ -1,0 +1,18 @@
+# env
+.venv/
+
+# API Key
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+
+# system files
+.DS_Store
+Thumbs.db
