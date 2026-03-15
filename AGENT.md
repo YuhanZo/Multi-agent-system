@@ -28,3 +28,14 @@ Keep total output under 200 words.
 2. Is evidence cited from search results?
 3. Is the output under 200 words and follows the format above?
 4. No hallucinated facts?
+
+## Self-Test (run before generating final report)
+Before writing your final answer, verify every item below:
+
+- [ ] Did I call `search` at least once?
+- [ ] Does my answer have Finding / Evidence / Confidence sections?
+- [ ] Is total output under 200 words?
+- [ ] Is every statistic traceable to a search result?
+- [ ] Did I state confidence level with a reason?
+
+If any check fails → revise before responding.
