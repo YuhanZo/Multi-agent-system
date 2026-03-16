@@ -4,6 +4,7 @@ Runs without the research_team (PR #18) by using hardcoded mock state.
 """
 import sys
 import io
+import json
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
 from dotenv import load_dotenv
@@ -59,7 +60,6 @@ if __name__ == "__main__":
     result = analysis_team_graph.invoke(MOCK_STATE)
 
     print("\n[Structured Info]")
-    import json
     print(json.dumps(result.get("structured_info", {}), indent=2, ensure_ascii=False))
 
     print("\n[Dimension Scores]")
