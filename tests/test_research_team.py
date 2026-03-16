@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # 将项目根目录添加到 python 路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.agent.research_team.graphy import analysis_team_graph
+from app.agent.research_team.graph import analysis_team_graph
 
 def test_research_flow(company_name: str):
     print(f"🚀 开始调研公司: {company_name}...")
