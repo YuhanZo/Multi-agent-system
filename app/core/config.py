@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Read Absolute Path
 APP_ROOT_DIR = Path(__file__).resolve().parent.parent
 PROMPT_DIR = APP_ROOT_DIR / "prompt"
+ENV_DIR = ".env"
 
 class Settings(BaseSettings):
     # --- API Keys ---
@@ -32,10 +33,11 @@ class Settings(BaseSettings):
 
     # update config from .env file
     model_config = SettingsConfigDict(
-        env_file=str(APP_ROOT_DIR / ".env"), 
+        env_file=str(ENV_DIR), 
         env_file_encoding="utf-8",
         extra="ignore"
+        
     )
-
+      
 # 3. instantiate setting
 settings = Settings()

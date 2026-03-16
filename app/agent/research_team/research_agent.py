@@ -10,7 +10,10 @@ from app.utils.prompt_utils import load_prompt
 def _get_research_llm():
     # TODO : bind search tool to the llm
     # llm = ChatAnthropic(model=settings.WORKER_MODEL).bind_tools([tavily_search_tool])
-    return ChatAnthropic(model=settings.WORKER_MODEL, temperature=0.2)
+    return ChatAnthropic(model=settings.WORKER_MODEL,
+                        max_tokens=settings.WORKER_MAX_TOKENS,
+                        api_key=settings.ANTHROPIC_API_KEY,
+                        temperature=0.2)
 
 # 1. Product Worker
 
