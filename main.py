@@ -1,6 +1,4 @@
 
-from app.core.config import ANTHROPIC_API_KEY
-
 def main() -> None:
     """Entry point for the application."""
     # TODO: implement main logic

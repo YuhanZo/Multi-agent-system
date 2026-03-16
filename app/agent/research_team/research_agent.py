@@ -116,7 +116,7 @@ def synthesize_profile(state: CompanyResearchState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-        "product resaerch report":\n{product_info}
+        "product research report":\n{product_info}
         \n---\n
         market research report:\n{market_info}
         \n---\n
