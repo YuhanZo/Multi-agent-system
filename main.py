@@ -1,37 +1,44 @@
+from dotenv import load_dotenv
+load_dotenv()
 
 import sys
-from pathlib import Path
-import anthropic
-from orchestrator import run_orchestrator
-from config import ANTHROPIC_API_KEY
+import asyncio
 
-AGENT_MD_PATH = Path(__file__).parent / "AGENT.md"
-DEFAULT_TOPIC = "The future of renewable energy storage"
+from config import ANTHROPIC_API_KEY, TAVILY_API_KEY
+from agents.research_orchestrator import run_research_orchestrator, aggregate_research
 
 
 def main() -> None:
-    topic = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else DEFAULT_TOPIC
-
-    if not ANTHROPIC_API_KEY:
-        print("Error: ANTHROPIC_API_KEY environment variable is not set.")
+    args = sys.argv[1:]
+    if len(args) < 2:
+        print("Usage: python main.py <target> <competitor1> [competitor2 ...]")
+        print("Example: python main.py Notion Obsidian Confluence")
         sys.exit(1)
 
-    # Load AGENT.md — injected into every agent's system prompt
-    agent_md = AGENT_MD_PATH.read_text(encoding="utf-8") if AGENT_MD_PATH.exists() else ""
-    if not agent_md:
-        print("Warning: AGENT.md not found — agents will run without shared instructions.")
+    target = args[0]
+    competitors = args[1:]
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    if not ANTHROPIC_API_KEY:
+        print("Error: ANTHROPIC_API_KEY not set in .env")
+        sys.exit(1)
+    if not TAVILY_API_KEY:
+        print("Error: TAVILY_API_KEY not set in .env")
+        sys.exit(1)
 
-    separator = "─" * 60
+    separator = "-" * 60
     print(separator)
-    print("  Research Multi-Agent System")
+    print(f"  Competitive Analysis: {target} vs {', '.join(competitors)}")
     print(separator)
 
-    report = run_orchestrator(client, topic, agent_md)
+    async def run() -> str:
+        research_data = await run_research_orchestrator(target, competitors)
+        print("\n[Orchestrator] Aggregating findings...")
+        return await aggregate_research(target, competitors, research_data)
 
-    print("\n" + separator)
-    print("  FINAL REPORT")
+    report = asyncio.run(run())
+
+    print(f"\n{separator}")
+    print("  RESEARCH REPORT")
     print(separator)
     print(report)
     print(separator)

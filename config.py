@@ -1,8 +1,9 @@
 
 import os
 
-# API 
+# API
 ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
+TAVILY_API_KEY: str = os.environ.get("TAVILY_API_KEY", "")
 
 # Models
 ORCHESTRATOR_MODEL: str = "claude-sonnet-4-6"
