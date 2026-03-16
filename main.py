@@ -2,10 +2,10 @@
 import sys
 from pathlib import Path
 import anthropic
-from orchestrator import run_orchestrator
-from config import ANTHROPIC_API_KEY
+from app.core.orchestrator import run_orchestrator
+from config.settings import ANTHROPIC_API_KEY
 
-AGENT_MD_PATH = Path(__file__).parent / "AGENT.md"
+AGENT_MD_PATH = Path(__file__).parent / "app" / "prompt" / "AGENT.md"
 DEFAULT_TOPIC = "The future of renewable energy storage"
 
 
