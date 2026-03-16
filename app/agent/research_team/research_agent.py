@@ -2,7 +2,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
 
-from core.config import settings
+from app.core.config import settings
 from .research_state import CompanyResearchState
 from app.utils.prompt_utils import load_prompt
 
