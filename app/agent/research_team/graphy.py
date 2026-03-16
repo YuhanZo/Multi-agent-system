@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, START, END
 from .research_state import CompanyResearchState
-from .research_agents import research_product, research_market, research_business, synthesize_profile
+from .research_agent import research_product, research_market, research_business, synthesize_profile
 
 # 1. initialize state gpraph
 research_builder = StateGraph(CompanyResearchState)
