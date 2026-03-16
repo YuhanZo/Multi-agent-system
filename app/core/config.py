@@ -1,5 +1,10 @@
 
 import os
+from pathlib import Path
+
+# Read Absolute Path
+APP_ROOT_DIR = Path(__file__).resolve().parent.parent
+PROMPT_DIR = APP_ROOT_DIR / "prompt"
 
 # API 
 ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
