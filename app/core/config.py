@@ -1,24 +1,43 @@
 
 import os
+from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# API 
-ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
+# Read Absolute Path
+APP_ROOT_DIR = Path(__file__).resolve().parent.parent
+PROMPT_DIR = APP_ROOT_DIR / "prompt"
+ENV_DIR = ".env"
 
-# Models
-ORCHESTRATOR_MODEL: str = "claude-sonnet-4-6"
-# Workers: handle focused sub-tasks → cheaper / faster model is fine
-WORKER_MODEL: str = "claude-haiku-4-5-20251001"
-# Compactor: summarises history → cheapest model is sufficient
-COMPACTOR_MODEL: str = "claude-haiku-4-5-20251001"
+class Settings(BaseSettings):
+    # --- API Keys ---
+    ANTHROPIC_API_KEY: str = ""
+    TAVILY_API_KEY: str = ""  # TODO: search tool implement
+    
+    # --- LangSmith  ---
+    LANGCHAIN_TRACING_V2: str = "true"
+    LANGCHAIN_API_KEY: str = ""
+    LANGCHAIN_PROJECT: str = "Company_Research_Agent"
 
-# Token budgets
-# Workers compact their context when estimated token count exceeds this.
-WORKER_CONTEXT_BUDGET: int = 3_000
-# Max tokens the worker can generate in a single turn.
-WORKER_MAX_TOKENS: int = 512
-# Max tokens the orchestrator can generate per turn.
-ORCHESTRATOR_MAX_TOKENS: int = 1_024
+    # --- Models ---
+    ORCHESTRATOR_MODEL: str = "claude-sonnet-4-6"
+    WORKER_MODEL: str = "claude-haiku-4-5-20251001"
+    COMPACTOR_MODEL: str = "claude-haiku-4-5-20251001"
 
-# Agentic loop 
-# Safety cap: worker exits loop after this many iterations even if not "done".
-MAX_WORKER_ITERATIONS: int = 4
+    # --- Token budgets ---
+    WORKER_CONTEXT_BUDGET: int = 3000
+    WORKER_MAX_TOKENS: int = 512
+    ORCHESTRATOR_MAX_TOKENS: int = 1024
+
+    # --- Agentic loop ---
+    MAX_WORKER_ITERATIONS: int = 4
+
+    # update config from .env file
+    model_config = SettingsConfigDict(
+        env_file=str(ENV_DIR), 
+        env_file_encoding="utf-8",
+        extra="ignore"
+        
+    )
+      
+# 3. instantiate setting
+settings = Settings()
