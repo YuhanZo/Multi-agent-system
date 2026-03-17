@@ -23,4 +23,4 @@ research_builder.add_edge(["product_researcher", "market_researcher", "business_
 research_builder.add_edge("profile_synthesizer", END)
 
 # compile to subgraph
-analysis_team_graph = research_builder.compile()
+research_team_graph = research_builder.compile()
