@@ -24,3 +24,8 @@ class AnalysisState(TypedDict):
     dimension_scores: DimensionScore
     investment_advice: str
     analysis_report: str
+
+    # Eval 专用的控制字段
+    revision_count: int    # 当前修改次数（默认为 0）
+    eval_feedback: str     
+    is_pass: bool
