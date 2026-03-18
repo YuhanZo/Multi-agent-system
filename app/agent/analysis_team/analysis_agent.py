@@ -2,7 +2,6 @@ import json
 import re
 from langchain_core.prompts import ChatPromptTemplate
 from app.core.llm_factory import LLMFactory, ModelRole
-from app.tool.tavily_search import tavily_search
 
 
 # Compatible with both current config (constants) and PR #18 config (settings object)
@@ -34,23 +33,26 @@ def _parse_json(text: str) -> dict:
 # 1. Structured Info Extractor
 def extract_structured_info(state: AnalysisState):
 
-    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
     
     prompt_text = load_prompt("analysis_extract.md")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+         company: {company}
 
-product info:\n{product_info}
+         product info:\n{product_info}
 
-market info:\n{market_info}
+         market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+         business info:\n{business_info}
+
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If a field is missing or unsupported, return null or explicitly say the evidence is insufficient.
+        """)
     ])
 
     chain = prompt | llm
@@ -67,23 +69,26 @@ business info:\n{business_info}
 # 2. Dimension Scorer
 def score_dimensions(state: AnalysisState):
 
-    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
     
     prompt_text = load_prompt("analysis_score.md")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company profile:\n{company_profile}
+         company profile:\n{company_profile}
 
-product info:\n{product_info}
+         product info:\n{product_info}
 
-market info:\n{market_info}
+         market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+         business info:\n{business_info}
+
+         You MUST score only based on the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If evidence for a dimension is weak, reflect that uncertainty in the score.
+        """)
     ])
 
     chain = prompt | llm
@@ -100,25 +105,28 @@ business info:\n{business_info}
 # 3. Investment / Competitive Advisor
 def advise_investment(state: AnalysisState):
 
-    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
 
     prompt_text = load_prompt("analysis_advise.md")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+         company: {company}
 
-company profile:\n{company_profile}
+         company profile:\n{company_profile}
 
-product info:\n{product_info}
+         product info:\n{product_info}
 
-market info:\n{market_info}
+         market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+         business info:\n{business_info}
+
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If evidence is insufficient, explicitly mention the uncertainty and missing information.
+        """)
     ])
 
     chain = prompt | llm
@@ -136,24 +144,40 @@ business info:\n{business_info}
 # 4. Report Generator (aggregates all analysis outputs)
 def generate_report(state: AnalysisState):
     
-    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
 
     prompt_text = load_prompt("analysis_report.md")
+
+    # get eval feedback
+    eval_feedback = state.get("eval_feedback", "")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+         company: {company}
 
-structured info:\n{structured_info}
+         structured info:\n{structured_info}
 
-dimension scores:\n{dimension_scores}
+         dimension scores:\n{dimension_scores}
 
-investment advice:\n{investment_advice}
-""")
+         investment advice:\n{investment_advice}
+                
+         {revision_context}
+
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If the input evidence is insufficient, preserve that uncertainty in the report instead of filling gaps.
+        """)
     ])
+
+    revision_context = ""
+    if eval_feedback:
+        revision_context = f"""
+        --- revision requirements ---
+        please improve the report based on feedback below:
+        {eval_feedback}
+        """
 
     chain = prompt | llm
     response = chain.invoke({
@@ -161,6 +185,7 @@ investment advice:\n{investment_advice}
         "structured_info": json.dumps(state.get("structured_info", {}), ensure_ascii=False, indent=2),
         "dimension_scores": json.dumps(state.get("dimension_scores", {}), ensure_ascii=False),
         "investment_advice": state.get("investment_advice", "no info"),
+        "revision_context": revision_context,
     })
 
     return {"analysis_report": response.content}

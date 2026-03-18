@@ -25,11 +25,33 @@ def tavily_search(query: str) -> list[dict]:
     # 4. 统一格式
     formatted_results = _format_search_results(raw_results)
 
-    print(formatted_results)
+    print("\n Tavily Result:")
+    for r in formatted_results[:3]:
+        print(f"- {r['title']}")
 
     # 5. 返回给agent
     return formatted_results
+
+"""def tavily_search(query: str) -> str:
+    """"""Perform web search using Tavily API.
     
+    This tool is used to retrieve up-to-date information
+    such as company data, market trends, competitors, etc.
+    
+    Input:
+        query: search query string
+        
+    Output:
+        summarized search results
+    """"""
+
+    print("\n================ TOOL CALL: TAVILY ================")
+    print(f"[QUERY]: {query}")
+
+    result = tavily_client.search(query=query)
+
+    return str(result)"""
+
 
 def _fetch_tavily_results(query: str):
     """

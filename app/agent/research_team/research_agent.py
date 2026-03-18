@@ -3,48 +3,69 @@ from .research_state import CompanyResearchState
 from app.utils.prompt_utils import load_prompt
 from app.tool.tavily_search import tavily_search
 from app.core.llm_factory import LLMFactory, ModelRole
+import json
 
 # 1. Product Worker
 
 def research_product(state: CompanyResearchState):
     company = state["company_name"]
 
-    search_tool = [tavily_search]
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
+    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
     
-    # 1. Read system prompt
+    # 1. 强制搜索
+    search_results = tavily_search.invoke({
+        "query": f"{company} product overview core features target users official site"
+    })
+
+    # 2. 读取prompt
     prompt_text = load_prompt("research_product.md")
     
-    # 2. Integrate prompt template
+    # 3. 将真实的搜索结果给LLM
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
-        ("human", "please do a research on company: {company}")
-    ]) 
+        ("human", """
+         company: {company}
 
-    # 3. Chaining prompt with llm
+         Here are real web search results:
+         {search_results}
+
+         you MUST answer only based on the search results above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If the evidence is insufficient, explicitly say what is missing.
+         """)
+    ])
+
     chain = prompt | llm
+    response = chain.invoke({
+        "company": company,
+        "search_results": json.dumps(search_results, ensure_ascii=False, indent=2)
+    })
 
-    # 4. Execute chain
-    response = chain.invoke({"company": company})
+    # 4. 用真实source
+    real_source = [
+        {"company": company, "dimension": "Product", "url": item.get("url", "")}
+        for item in search_results[:5]
+    ]
     
     # TODO: get real url from tool
-    mock_source = [{"company": company, "dimension": "Product", "url": "https://example.com/product"}]   
+    # mock_source = [{"company": company, "dimension": "Product", "url": "https://example.com/product"}]   
 
     # return the updated states var
     return {
         "product_info": response.content,
-        "reference_sources": mock_source
+        "reference_sources": real_source
     }
 
 # 2. Market Worker
 
 def research_market(state: CompanyResearchState):
     company = state["company_name"]
+    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
 
-    search_tool = [tavily_search]
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
+    search_results = tavily_search.invoke({
+        "query": f"{company} user reviews reputation pain points competitors moat"
+    })
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_market.md")
@@ -52,20 +73,36 @@ def research_market(state: CompanyResearchState):
     # 2. Integrate prompt template
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
-        ("human", "please do a research on company: {company}")
+        ("human", """
+         company: {company}
+
+         Here are real web search results:
+         {search_results}
+
+         You MUST answer only based on the search results above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If the evidence is insufficient, explicitly say what is missing.
+         """)
     ]) 
 
     # 3. Chaining prompt with llm
     chain = prompt | llm
 
     # 4. Execute chain
-    response = chain.invoke({"company": company})
+    response = chain.invoke({
+        "company": company, 
+        "search_results": json.dumps(search_results, ensure_ascii=False, indent=2)
+    })
     
-    mock_source = [{"company": company, "dimension": "Market", "url": "https://example.com/reviews"}]
+    real_source = [
+        {"company": company, "dimension": "Market", "url": item.get("url", "")}
+        for item in search_results[:5]
+    ]
     
     return {
         "market_info": response.content,
-        "reference_sources": mock_source
+        "reference_sources": real_source
     }
 
 
@@ -73,10 +110,11 @@ def research_market(state: CompanyResearchState):
 
 def research_business(state: CompanyResearchState):
     company = state["company_name"]
+    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
 
-    search_tool = [tavily_search]
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)    
+    search_results = tavily_search.invoke({
+        "query": f"{company} pricing revenue funding investors growth business model"
+    })
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_business.md")
@@ -84,20 +122,36 @@ def research_business(state: CompanyResearchState):
     # 2. Integrate prompt template
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
-        ("human", "please do a research on company: {company}")
-    ]) 
+        ("human", """
+         company: {company}
+         
+         Here are real web search results:
+         {search_results}
+         
+         You MUST answer only based on the search results above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If the evidence is insufficient, explicitly say what is missing.
+         """)
+    ])
 
     # 3. Chaining prompt with llm
     chain = prompt | llm
 
     # 4. Execute chain
-    response = chain.invoke({"company": company})
-    
-    mock_source = [{"company": company, "dimension": "Business", "url": "https://example.com/funding"}]
+    response = chain.invoke({
+        "company": company,
+        "search_results": json.dumps(search_results, ensure_ascii=False, indent=2)
+    })
+
+    real_source = [
+        {"company": company, "dimension": "Business", "url": item.get("url", "")}
+        for item in search_results[:5]
+    ]
     
     return {
         "business_info": response.content,
-        "reference_sources": mock_source
+        "reference_sources": real_source
     }
 
 # 4. Synthesizer
@@ -105,9 +159,7 @@ def research_business(state: CompanyResearchState):
 def synthesize_profile(state: CompanyResearchState):
     company = state["company_name"]
 
-    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
-    llm_with_tools = llm.bind_tools(search_tool)
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
@@ -116,12 +168,17 @@ def synthesize_profile(state: CompanyResearchState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-        "product research report":\n{product_info}
-        \n---\n
-        market research report:\n{market_info}
-        \n---\n
-        business research report:\n{business_info}
-        """)
+         product research report:
+         {product_info}
+
+         ---
+         market research report:
+         {market_info}
+
+         ---
+         business research report:
+         {business_info}
+         """)
     ]) 
 
     # 3. Chaining
