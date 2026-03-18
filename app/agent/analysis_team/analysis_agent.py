@@ -1,7 +1,8 @@
 import json
 import re
-from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
+from app.core.llm_factory import LLMFactory, ModelRole
+
 
 # Compatible with both current config (constants) and PR #18 config (settings object)
 try:
@@ -29,19 +30,9 @@ def _parse_json(text: str) -> dict:
     except json.JSONDecodeError:
         return {"raw": text}
 
-
-def _get_analysis_llm():
-    return ChatAnthropic(
-        model=WORKER_MODEL,
-        max_tokens=WORKER_MAX_TOKENS,
-        api_key=ANTHROPIC_API_KEY,
-        temperature=0.2,
-    )
-
-
 # 1. Structured Info Extractor
 def extract_structured_info(state: AnalysisState):
-    llm = _get_analysis_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     prompt_text = load_prompt("analysis_extract.md")
 
     prompt = ChatPromptTemplate.from_messages([
@@ -70,7 +61,7 @@ business info:\n{business_info}
 
 # 2. Dimension Scorer
 def score_dimensions(state: AnalysisState):
-    llm = _get_analysis_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     prompt_text = load_prompt("analysis_score.md")
 
     prompt = ChatPromptTemplate.from_messages([
@@ -99,12 +90,8 @@ business info:\n{business_info}
 
 # 3. Investment / Competitive Advisor
 def advise_investment(state: AnalysisState):
-    llm = ChatAnthropic(
-        model=ORCHESTRATOR_MODEL,
-        max_tokens=ORCHESTRATOR_MAX_TOKENS,
-        api_key=ANTHROPIC_API_KEY,
-        temperature=0.3,
-    )
+    llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+
     prompt_text = load_prompt("analysis_advise.md")
 
     prompt = ChatPromptTemplate.from_messages([
@@ -136,12 +123,8 @@ business info:\n{business_info}
 
 # 4. Report Generator (aggregates all analysis outputs)
 def generate_report(state: AnalysisState):
-    llm = ChatAnthropic(
-        model=ORCHESTRATOR_MODEL,
-        max_tokens=ORCHESTRATOR_MAX_TOKENS,
-        api_key=ANTHROPIC_API_KEY,
-        temperature=0.3,
-    )
+    llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+
     prompt_text = load_prompt("analysis_report.md")
 
     prompt = ChatPromptTemplate.from_messages([
