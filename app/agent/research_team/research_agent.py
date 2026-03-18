@@ -11,7 +11,7 @@ def research_product(state: CompanyResearchState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools([search_tool])
+    llm_with_tools = llm.bind_tools(search_tool)
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_product.md")
@@ -44,7 +44,7 @@ def research_market(state: CompanyResearchState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools([search_tool])
+    llm_with_tools = llm.bind_tools(search_tool)
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_market.md")
@@ -76,7 +76,7 @@ def research_business(state: CompanyResearchState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools([search_tool])    
+    llm_with_tools = llm.bind_tools(search_tool)    
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_business.md")
@@ -107,7 +107,7 @@ def synthesize_profile(state: CompanyResearchState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
-    llm_with_tools = llm.bind_tools([search_tool])
+    llm_with_tools = llm.bind_tools(search_tool)
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
