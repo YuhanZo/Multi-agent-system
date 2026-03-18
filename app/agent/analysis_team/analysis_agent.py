@@ -76,14 +76,14 @@ def score_dimensions(state: AnalysisState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company profile:\n{company_profile}
+        company profile:\n{company_profile}
 
-product info:\n{product_info}
+        product info:\n{product_info}
 
-market info:\n{market_info}
+        market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+        business info:\n{business_info}
+        """)
     ])
 
     chain = prompt | llm
@@ -110,16 +110,16 @@ def advise_investment(state: AnalysisState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+    company: {company}
 
-company profile:\n{company_profile}
+    company profile:\n{company_profile}
 
-product info:\n{product_info}
+    product info:\n{product_info}
 
-market info:\n{market_info}
+    market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+    business info:\n{business_info}
+    """)
     ])
 
     chain = prompt | llm
@@ -144,6 +144,9 @@ def generate_report(state: AnalysisState):
     )
     prompt_text = load_prompt("analysis_report.md")
 
+    # get eval feedback
+    eval_feedback = state.get("eval_feedback", "")
+
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
@@ -154,8 +157,19 @@ structured info:\n{structured_info}
 dimension scores:\n{dimension_scores}
 
 investment advice:\n{investment_advice}
+         
+{revision_context}
+
 """)
     ])
+
+    revision_context = ""
+    if eval_feedback:
+        revision_context = f"""
+        --- revision requirements ---
+        please imporve the report based on feedbacks below:
+        {eval_feedback}
+        """
 
     chain = prompt | llm
     response = chain.invoke({
@@ -163,6 +177,7 @@ investment advice:\n{investment_advice}
         "structured_info": json.dumps(state.get("structured_info", {}), ensure_ascii=False, indent=2),
         "dimension_scores": json.dumps(state.get("dimension_scores", {}), ensure_ascii=False),
         "investment_advice": state.get("investment_advice", "no info"),
+        "revision_context": revision_context,
     })
 
     return {"analysis_report": response.content}
