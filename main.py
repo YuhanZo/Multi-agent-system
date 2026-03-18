@@ -9,7 +9,7 @@ from app.core.config import settings
 
 
 def main():
-    company = "Notion"
+    company = "Mihoyo"
     
     # 1. Research
     research_result = research_team_graph.invoke({"company_name": company})

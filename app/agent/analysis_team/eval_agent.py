@@ -15,7 +15,7 @@ def _parse_eval_result(text: str) -> dict:
         result = json.loads(cleaned)
         return {
             "is_pass": result.get("is_pass", False),
-            "feedback": result.get("feedback", "")
+            "feedback": result.get("eval_feedback", "")
         }
     except json.JSONDecodeError:
         return {"is_pass": False, "feedback": text}
