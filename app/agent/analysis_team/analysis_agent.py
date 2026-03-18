@@ -167,7 +167,7 @@ investment advice:\n{investment_advice}
     if eval_feedback:
         revision_context = f"""
         --- revision requirements ---
-        please imporve the report based on feedbacks below:
+        please improve the report based on feedback below:
         {eval_feedback}
         """
 

@@ -11,11 +11,13 @@ Assess the report across these five dimensions:
 
 ## Output Format
 
-Return ONLY the following three fields, no additional commentary:
+Return ONLY a valid JSON object with the following fields (use null if information is not available):
+{{
+  "eval_feedback": "A concise summary (3–5 sentences) of the report's key strengths and weaknesses across the five dimensions above.",
+  "is_pass": boolean  // true if the report meets a satisfactory standard across all five dimensions, false otherwise
+}}
 
-**eval_feedback**: A concise summary (3–5 sentences) of the report's key strengths and weaknesses across the five dimensions above. Be direct and specific.
-
-**is_pass**: true if the report meets a satisfactory standard across all five dimensions, false if one or more dimensions have critical gaps.
+Do not include any explanation or markdown — only the raw JSON object.
 
 ---
 
