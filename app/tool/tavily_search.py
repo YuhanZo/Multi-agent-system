@@ -2,10 +2,7 @@ import os
 from tavily import TavilyClient
 from dotenv import load_dotenv
 from langchain.tools import tool
-
-load_dotenv()
-
-TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+from app.core.config import settings
 
 
 @tool
@@ -36,7 +33,7 @@ def _fetch_tavily_results(query: str):
     """
         调用tavily search的API，并拿回原始响应
     """
-    tavily_client = TavilyClient(api_key = TAVILY_API_KEY)
+    tavily_client = TavilyClient(api_key = settings.TAVILY_API_KEY)
     response = tavily_client.search(query)
     return response
 

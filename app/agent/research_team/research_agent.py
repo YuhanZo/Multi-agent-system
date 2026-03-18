@@ -1,14 +1,17 @@
 from langchain_core.prompts import ChatPromptTemplate
 from .research_state import CompanyResearchState
 from app.utils.prompt_utils import load_prompt
-
+from app.tool.tavily_search import tavily_search
 from app.core.llm_factory import LLMFactory, ModelRole
 
 # 1. Product Worker
 
 def research_product(state: CompanyResearchState):
     company = state["company_name"]
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm_with_tools = llm.bind_tools([search_tool])
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_product.md")
@@ -38,7 +41,10 @@ def research_product(state: CompanyResearchState):
 
 def research_market(state: CompanyResearchState):
     company = state["company_name"]
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm_with_tools = llm.bind_tools([search_tool])
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_market.md")
@@ -67,8 +73,11 @@ def research_market(state: CompanyResearchState):
 
 def research_business(state: CompanyResearchState):
     company = state["company_name"]
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    
+    llm_with_tools = llm.bind_tools([search_tool])    
+
     # 1. Read system prompt
     prompt_text = load_prompt("research_business.md")
     
@@ -96,8 +105,10 @@ def research_business(state: CompanyResearchState):
 def synthesize_profile(state: CompanyResearchState):
     company = state["company_name"]
 
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
-    
+    llm_with_tools = llm.bind_tools([tavily_search])
+
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
     

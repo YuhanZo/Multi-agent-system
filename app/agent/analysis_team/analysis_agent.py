@@ -2,6 +2,7 @@ import json
 import re
 from langchain_core.prompts import ChatPromptTemplate
 from app.core.llm_factory import LLMFactory, ModelRole
+from app.tool.tavily_search import tavily_search
 
 
 # Compatible with both current config (constants) and PR #18 config (settings object)
@@ -32,7 +33,11 @@ def _parse_json(text: str) -> dict:
 
 # 1. Structured Info Extractor
 def extract_structured_info(state: AnalysisState):
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm_with_tools = llm.bind_tools([tavily_search])
+    
     prompt_text = load_prompt("analysis_extract.md")
 
     prompt = ChatPromptTemplate.from_messages([
@@ -61,7 +66,11 @@ business info:\n{business_info}
 
 # 2. Dimension Scorer
 def score_dimensions(state: AnalysisState):
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm_with_tools = llm.bind_tools([tavily_search])
+    
     prompt_text = load_prompt("analysis_score.md")
 
     prompt = ChatPromptTemplate.from_messages([
@@ -90,7 +99,10 @@ business info:\n{business_info}
 
 # 3. Investment / Competitive Advisor
 def advise_investment(state: AnalysisState):
+
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+    llm_with_tools = llm.bind_tools([tavily_search])
 
     prompt_text = load_prompt("analysis_advise.md")
 
@@ -123,7 +135,10 @@ business info:\n{business_info}
 
 # 4. Report Generator (aggregates all analysis outputs)
 def generate_report(state: AnalysisState):
+    
+    search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+    llm_with_tools = llm.bind_tools([tavily_search])
 
     prompt_text = load_prompt("analysis_report.md")
 
