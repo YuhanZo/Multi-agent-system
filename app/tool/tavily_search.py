@@ -25,6 +25,8 @@ def tavily_search(query: str) -> list[dict]:
     # 4. 统一格式
     formatted_results = _format_search_results(raw_results)
 
+    print(formatted_results)
+
     # 5. 返回给agent
     return formatted_results
     
