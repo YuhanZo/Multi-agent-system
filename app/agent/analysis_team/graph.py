@@ -11,7 +11,7 @@ from .analysis_agent import (
 from .eval_agent import (evaluate_report)
 
 def should_revise(state: AnalysisState) -> str:
-    MAX_REVISIONS = 2
+    MAX_REVISIONS = 3
     if state.get("is_pass", False):
         return "end"
     if state.get("revision_count", 0) >= MAX_REVISIONS:
