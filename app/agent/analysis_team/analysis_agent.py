@@ -32,20 +32,27 @@ def _parse_json(text: str) -> dict:
 
 # 1. Structured Info Extractor
 def extract_structured_info(state: AnalysisState):
+
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    
     prompt_text = load_prompt("analysis_extract.md")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+         company: {company}
 
-product info:\n{product_info}
+         product info:\n{product_info}
 
-market info:\n{market_info}
+         market info:\n{market_info}
 
-business info:\n{business_info}
-""")
+         business info:\n{business_info}
+
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If a field is missing or unsupported, return null or explicitly say the evidence is insufficient.
+        """)
     ])
 
     chain = prompt | llm
@@ -61,19 +68,26 @@ business info:\n{business_info}
 
 # 2. Dimension Scorer
 def score_dimensions(state: AnalysisState):
+
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    
     prompt_text = load_prompt("analysis_score.md")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-        company profile:\n{company_profile}
+         company profile:\n{company_profile}
 
-        product info:\n{product_info}
+         product info:\n{product_info}
 
-        market info:\n{market_info}
+         market info:\n{market_info}
 
-        business info:\n{business_info}
+         business info:\n{business_info}
+
+         You MUST score only based on the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If evidence for a dimension is weak, reflect that uncertainty in the score.
         """)
     ])
 
@@ -90,6 +104,7 @@ def score_dimensions(state: AnalysisState):
 
 # 3. Investment / Competitive Advisor
 def advise_investment(state: AnalysisState):
+
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
 
     prompt_text = load_prompt("analysis_advise.md")
@@ -97,16 +112,21 @@ def advise_investment(state: AnalysisState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-    company: {company}
+         company: {company}
 
-    company profile:\n{company_profile}
+         company profile:\n{company_profile}
 
-    product info:\n{product_info}
+         product info:\n{product_info}
 
-    market info:\n{market_info}
+         market info:\n{market_info}
 
-    business info:\n{business_info}
-    """)
+         business info:\n{business_info}
+
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If evidence is insufficient, explicitly mention the uncertainty and missing information.
+        """)
     ])
 
     chain = prompt | llm
@@ -123,6 +143,7 @@ def advise_investment(state: AnalysisState):
 
 # 4. Report Generator (aggregates all analysis outputs)
 def generate_report(state: AnalysisState):
+    
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
 
     prompt_text = load_prompt("analysis_report.md")
@@ -133,17 +154,21 @@ def generate_report(state: AnalysisState):
     prompt = ChatPromptTemplate.from_messages([
         ("system", prompt_text),
         ("human", """
-company: {company}
+         company: {company}
 
-structured info:\n{structured_info}
+         structured info:\n{structured_info}
 
-dimension scores:\n{dimension_scores}
+         dimension scores:\n{dimension_scores}
 
-investment advice:\n{investment_advice}
-         
-{revision_context}
+         investment advice:\n{investment_advice}
+                
+         {revision_context}
 
-""")
+         You MUST use only the information provided above.
+         Do NOT use prior knowledge.
+         Do NOT invent facts.
+         If the input evidence is insufficient, preserve that uncertainty in the report instead of filling gaps.
+        """)
     ])
 
     revision_context = ""

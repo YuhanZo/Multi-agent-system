@@ -1,12 +1,9 @@
 from dotenv import load_dotenv
 from app.agent.research_team.graph import research_team_graph
 from app.agent.analysis_team.graph import analysis_team_graph
+import json
 
 load_dotenv()
-
-import sys
-from app.core.config import settings
-
 
 def main():
     company = "Mihoyo"
@@ -26,7 +23,7 @@ def main():
     # 3. Analysis
     analysis_result = analysis_team_graph.invoke(analysis_input)
 
-    print(analysis_result)
+    print(json.dumps(analysis_result, indent=2, ensure_ascii=False).encode("gbk", errors="ignore").decode("gbk"))
     # TODO: wire up research_team + analysis_team graphs
 
 if __name__ == "__main__":
