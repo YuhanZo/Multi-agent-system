@@ -9,8 +9,13 @@ PROMPT_DIR = APP_ROOT_DIR / "prompt"
 ENV_DIR = ".env"
 
 class Settings(BaseSettings):
+    # --- LLM Provider ---
+    LLM_PROVIDER: str = "anthropic"  # anthropic | openai | qwen
+    
     # --- API Keys ---
     ANTHROPIC_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+    DASHSCOPE_API_KEY: str = ""  # Qwen
     TAVILY_API_KEY: str = ""  # TODO: search tool implement
     
     # --- LangSmith  ---
