@@ -23,11 +23,19 @@ class DimensionScore(TypedDict):
     team: int         # 团队/执行力 (1-10)
 
 
+# Default tasks for dynamic graph
+DEFAULT_ANALYSIS_TASKS = ["extract", "score", "advise"]
+
+
 class AnalysisState(CompanyResearchState):
-    # Outputs of three parallel analysis nodes
+    # Outputs of three parallel analysis nodes (static graph)
     structured_info: dict         # 结构化提取：融资轮次、估值、核心产品等
     dimension_scores: DimensionScore  # 六边形打分
     investment_advice: str        # 投资/竞品建议
+
+    # Dynamic graph fields
+    analysis_tasks: list[str]                              # runtime task list
+    analysis_results: Annotated[list[dict], operator.add]  # concurrent-safe aggregation
 
     # Final merged report
     analysis_report: str
