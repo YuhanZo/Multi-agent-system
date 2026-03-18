@@ -1,25 +1,14 @@
-from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
-
-from app.core.config import settings
 from .research_state import CompanyResearchState
 from app.utils.prompt_utils import load_prompt
 
-# get llm from config
-def _get_research_llm():
-    # TODO : bind search tool to the llm
-    # llm = ChatAnthropic(model=settings.WORKER_MODEL).bind_tools([tavily_search_tool])
-    return ChatAnthropic(model=settings.WORKER_MODEL,
-                        max_tokens=settings.WORKER_MAX_TOKENS,
-                        api_key=settings.ANTHROPIC_API_KEY,
-                        temperature=0.2)
+from app.core.llm_factory import LLMFactory, ModelRole
 
 # 1. Product Worker
 
 def research_product(state: CompanyResearchState):
     company = state["company_name"]
-    llm = _get_research_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_product.md")
@@ -49,7 +38,7 @@ def research_product(state: CompanyResearchState):
 
 def research_market(state: CompanyResearchState):
     company = state["company_name"]
-    llm = _get_research_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_market.md")
@@ -78,7 +67,7 @@ def research_market(state: CompanyResearchState):
 
 def research_business(state: CompanyResearchState):
     company = state["company_name"]
-    llm = _get_research_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_business.md")
@@ -107,7 +96,7 @@ def research_business(state: CompanyResearchState):
 def synthesize_profile(state: CompanyResearchState):
     company = state["company_name"]
 
-    llm = ChatAnthropic(model=settings.ORCHESTRATOR_MODEL, temperature=0.3)
+    llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
     
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
