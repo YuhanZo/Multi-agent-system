@@ -46,10 +46,9 @@ MOCK_STATE = {
         "is transitioning from a prosumer tool to an enterprise solution, competing "
         "with both Atlassian and Microsoft in the collaboration space."
     ),
-    # --- Analysis outputs (empty, to be filled by graph) ---
-    "structured_info": {},
-    "dimension_scores": {},
-    "investment_advice": "",
+    # --- Dynamic worker config ---
+    "analysis_tasks": ["extract", "score", "advise"],  # can add more tasks here
+    "analysis_results": [],
     "analysis_report": "",
 }
 
@@ -59,14 +58,16 @@ if __name__ == "__main__":
 
     result = analysis_team_graph.invoke(MOCK_STATE)
 
+    results = {r["task"]: r["content"] for r in result.get("analysis_results", [])}
+
     print("\n[Structured Info]")
-    print(json.dumps(result.get("structured_info", {}), indent=2, ensure_ascii=False))
+    print(json.dumps(results.get("extract", {}), indent=2, ensure_ascii=False))
 
     print("\n[Dimension Scores]")
-    print(json.dumps(result.get("dimension_scores", {}), indent=2))
+    print(json.dumps(results.get("score", {}), indent=2))
 
     print("\n[Investment Advice]")
-    print(result.get("investment_advice", ""))
+    print(results.get("advise", ""))
 
     print("\n[Final Report]")
     print(result.get("analysis_report", ""))
