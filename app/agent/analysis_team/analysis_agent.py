@@ -36,7 +36,7 @@ def extract_structured_info(state: AnalysisState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools([tavily_search])
+    llm_with_tools = llm.bind_tools([search_tool])
     
     prompt_text = load_prompt("analysis_extract.md")
 
@@ -69,7 +69,7 @@ def score_dimensions(state: AnalysisState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.WORKER,"qwen")
-    llm_with_tools = llm.bind_tools([tavily_search])
+    llm_with_tools = llm.bind_tools([search_tool])
     
     prompt_text = load_prompt("analysis_score.md")
 
@@ -102,7 +102,7 @@ def advise_investment(state: AnalysisState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
-    llm_with_tools = llm.bind_tools([tavily_search])
+    llm_with_tools = llm.bind_tools([search_tool])
 
     prompt_text = load_prompt("analysis_advise.md")
 
@@ -138,7 +138,7 @@ def generate_report(state: AnalysisState):
     
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
-    llm_with_tools = llm.bind_tools([tavily_search])
+    llm_with_tools = llm.bind_tools([search_tool])
 
     prompt_text = load_prompt("analysis_report.md")
 

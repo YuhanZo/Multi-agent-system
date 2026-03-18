@@ -107,7 +107,7 @@ def synthesize_profile(state: CompanyResearchState):
 
     search_tool = [tavily_search]
     llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
-    llm_with_tools = llm.bind_tools([tavily_search])
+    llm_with_tools = llm.bind_tools([search_tool])
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
