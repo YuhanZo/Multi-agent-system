@@ -25,6 +25,8 @@ def main():
     
     # 3. Analysis
     analysis_result = analysis_team_graph.invoke(analysis_input)
+
+    print(analysis_result)
     # TODO: wire up research_team + analysis_team graphs
 
 if __name__ == "__main__":

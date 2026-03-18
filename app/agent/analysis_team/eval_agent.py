@@ -2,20 +2,11 @@ import json
 import re
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
+from app.core.llm_factory import LLMFactory, ModelRole
 
 from app.core.config import settings
 from app.utils.prompt_utils import load_prompt
 from .analysis_state import AnalysisState
-
-
-def _get_eval_llm():
-    return ChatAnthropic(
-        model=settings.WORKER_MODEL,
-        max_tokens=settings.WORKER_MAX_TOKENS,
-        api_key=settings.ANTHROPIC_API_KEY,
-        temperature=0.2
-    )
-
 
 def _parse_eval_result(text: str) -> dict:
     """Parse evaluation result from LLM response."""
@@ -32,7 +23,7 @@ def _parse_eval_result(text: str) -> dict:
 
 def evaluate_report(state: AnalysisState) -> dict:
     """Evaluate the quality of analysis_report."""
-    llm = _get_eval_llm()
+    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
     prompt_text = load_prompt("analysis_eval.md")
 
     prompt = ChatPromptTemplate.from_messages([
