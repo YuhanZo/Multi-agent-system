@@ -23,7 +23,7 @@ def _parse_eval_result(text: str) -> dict:
 
 def evaluate_report(state: AnalysisState) -> dict:
     """Evaluate the quality of analysis_report."""
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
     prompt_text = load_prompt("analysis_eval.md")
 
     prompt = ChatPromptTemplate.from_messages([

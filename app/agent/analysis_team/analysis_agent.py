@@ -33,7 +33,7 @@ def _parse_json(text: str) -> dict:
 # 1. Structured Info Extractor
 def extract_structured_info(state: AnalysisState):
 
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
     
     prompt_text = load_prompt("analysis_extract.md")
 
@@ -69,7 +69,7 @@ def extract_structured_info(state: AnalysisState):
 # 2. Dimension Scorer
 def score_dimensions(state: AnalysisState):
 
-    llm = LLMFactory.create(ModelRole.WORKER,"qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
     
     prompt_text = load_prompt("analysis_score.md")
 
@@ -105,7 +105,7 @@ def score_dimensions(state: AnalysisState):
 # 3. Investment / Competitive Advisor
 def advise_investment(state: AnalysisState):
 
-    llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+    llm = LLMFactory.create(ModelRole.ORCHESTRATOR)
 
     prompt_text = load_prompt("analysis_advise.md")
 
@@ -144,7 +144,7 @@ def advise_investment(state: AnalysisState):
 # 4. Report Generator (aggregates all analysis outputs)
 def generate_report(state: AnalysisState):
     
-    llm = LLMFactory.create(ModelRole.ORCHESTRATOR,"qwen")
+    llm = LLMFactory.create(ModelRole.ORCHESTRATOR)
 
     prompt_text = load_prompt("analysis_report.md")
 

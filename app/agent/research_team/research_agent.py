@@ -10,7 +10,7 @@ import json
 def research_product(state: CompanyResearchState):
     company = state["company_name"]
 
-    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
     
     # 1. 强制搜索
     search_results = tavily_search.invoke({
@@ -61,7 +61,7 @@ def research_product(state: CompanyResearchState):
 
 def research_market(state: CompanyResearchState):
     company = state["company_name"]
-    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
 
     search_results = tavily_search.invoke({
         "query": f"{company} user reviews reputation pain points competitors moat"
@@ -110,7 +110,7 @@ def research_market(state: CompanyResearchState):
 
 def research_business(state: CompanyResearchState):
     company = state["company_name"]
-    llm = LLMFactory.create(ModelRole.WORKER, "qwen")
+    llm = LLMFactory.create(ModelRole.WORKER)
 
     search_results = tavily_search.invoke({
         "query": f"{company} pricing revenue funding investors growth business model"
@@ -159,7 +159,7 @@ def research_business(state: CompanyResearchState):
 def synthesize_profile(state: CompanyResearchState):
     company = state["company_name"]
 
-    llm = LLMFactory.create(ModelRole.COMPACTOR,"qwen")
+    llm = LLMFactory.create(ModelRole.COMPACTOR)
 
     # 1. Read system prompt
     prompt_text = load_prompt("research_synthesize.md")
