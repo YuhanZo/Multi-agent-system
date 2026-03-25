@@ -2,30 +2,36 @@
 from typing import TypedDict, Annotated
 import operator
 
+from app.agent.research_team.research_state import CompanyResearchState
+
+
 class DimensionScore(TypedDict):
-    product: int      # 产品力 (1-10)
-    market: int       # 市场空间 (1-10)
-    business: int     # 商业模式 (1-10)
-    technology: int   # 技术壁垒 (1-10)
-    growth: int       # 增长潜力 (1-10)
-    team: int         # 团队/执行力 (1-10)
+    product: int      # 1-10
+    market: int       # 1-10
+    business: int     # 1-10
+    technology: int   # 1-10
+    growth: int       # 1-10
+    team: int         # 1-10
 
 
-class AnalysisState(TypedDict):
-    # 输入字段（从 Research 传入）
-    company_name: str
-    product_info: str
-    market_info: str
-    business_info: str
-    company_profile: str
-    
-    # Analysis 自己的输出
+# Default tasks for dynamic graph
+DEFAULT_ANALYSIS_TASKS = ["extract", "score", "advise"]
+
+
+class AnalysisState(CompanyResearchState):
+    # Outputs of three parallel analysis nodes
     structured_info: dict
     dimension_scores: DimensionScore
     investment_advice: str
+
+    # Dynamic graph fields
+    analysis_tasks: list[str]
+    analysis_results: Annotated[list[dict], operator.add]
+
+    # Final report
     analysis_report: str
 
-    # Eval 专用的控制字段
-    revision_count: int    # 当前修改次数（默认为 0）
-    eval_feedback: str     
+    # Eval control fields
+    revision_count: int
+    eval_feedback: str
     is_pass: bool
