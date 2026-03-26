@@ -6,7 +6,7 @@ import json
 load_dotenv()
 
 def main():
-    company = "Mihoyo"
+    company = "Notion"
     
     # 1. Research
     research_result = research_team_graph.invoke({"company_name": company})
@@ -18,6 +18,7 @@ def main():
         "market_info": research_result["market_info"],
         "business_info": research_result["business_info"],
         "company_profile": research_result["company_profile"],
+        "reference_sources": research_result["reference_sources"],
     }
     
     # 3. Analysis

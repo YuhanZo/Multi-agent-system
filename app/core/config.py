@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     # --- Token budgets ---
     WORKER_CONTEXT_BUDGET: int = 3000
     WORKER_MAX_TOKENS: int = 512
-    ORCHESTRATOR_MAX_TOKENS: int = 1024
+    ORCHESTRATOR_MAX_TOKENS: int = 4096
 
     # --- Agentic loop ---
     MAX_WORKER_ITERATIONS: int = 4
