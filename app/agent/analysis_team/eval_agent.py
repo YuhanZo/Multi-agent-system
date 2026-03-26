@@ -13,12 +13,15 @@ def _parse_eval_result(text: str) -> dict:
     cleaned = re.sub(r"```(?:json)?\s*|\s*```", "", text).strip()
     try:
         result = json.loads(cleaned)
+        total = result.get("total", 0)
         return {
-            "is_pass": result.get("is_pass", False),
-            "feedback": result.get("eval_feedback", "")
+            "is_pass": result.get("is_pass", total >= 11),
+            "feedback": result.get("eval_feedback", ""),
+            "scores": result.get("scores", {}),
+            "total": total,
         }
     except json.JSONDecodeError:
-        return {"is_pass": False, "feedback": text}
+        return {"is_pass": False, "feedback": text, "scores": {}, "total": 0}
 
 
 def evaluate_report(state: AnalysisState) -> dict:
